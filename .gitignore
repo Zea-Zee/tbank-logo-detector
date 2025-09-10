@@ -1,0 +1,13 @@
+.venv/
+*project_x*
+big_group
+clusterized_images
+data_sirius
+extracted_data_sirius
+negative_train
+negative_valid
+predicted_images
+tbank
+tinkoff
+Новая папка
+runs
