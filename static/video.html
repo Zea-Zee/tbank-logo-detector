@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>T-Bank Video Detector</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #fafafa;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 20px;
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            color: #000;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #333;
+            font-size: 1.1em;
+        }
+
+        .upload-section {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .upload-area {
+            border: 3px dashed #ffd700;
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #fffef7;
+        }
+
+        .upload-area:hover {
+            border-color: #ffed4e;
+            background: #fffef0;
+        }
+
+        .upload-area.dragover {
+            border-color: #ffed4e;
+            background: #fffef0;
+        }
+
+        .upload-icon {
+            font-size: 3em;
+            color: #ffd700;
+            margin-bottom: 20px;
+        }
+
+        .upload-text {
+            font-size: 1.2em;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .upload-subtext {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        .btn {
+            background: #ffd700;
+            color: #000;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin: 10px;
+        }
+
+        .btn:hover {
+            background: #ffed4e;
+            transform: translateY(-2px);
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .progress-container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            display: none;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #f0f0f0;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ffd700, #ffed4e);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .progress-text {
+            text-align: center;
+            font-size: 1.1em;
+            color: #333;
+        }
+
+        .result-section {
+            display: none;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .result-video {
+            max-width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .stats {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #ffd700;
+            text-align: center;
+        }
+
+        .stat-item {
+            display: inline-block;
+            margin: 0 20px;
+            padding: 10px 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #ffd700;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .nav {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .nav a {
+            color: #ffd700;
+            text-decoration: none;
+            font-weight: 600;
+            margin: 0 20px;
+            padding: 10px 20px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .nav a:hover {
+            background: #fffef0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎥 T-Bank Video Detector</h1>
+            <p>Обнаружение логотипа Т-Банка на видео</p>
+        </div>
+
+        <div class="nav">
+            <a href="/">📷 Изображения</a>
+            <a href="/video">🎥 Видео</a>
+        </div>
+
+        <div class="upload-section">
+            <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+                <div class="upload-icon">🎥</div>
+                <div class="upload-text">Нажмите или перетащите видео</div>
+                <div class="upload-subtext">Поддерживаемые форматы: MP4, AVI</div>
+            </div>
+            <input type="file" id="fileInput" accept="video/*">
+            <div style="text-align: center; margin-top: 20px;">
+                <button class="btn" onclick="processVideo()" id="processBtn" disabled>Обработать видео</button>
+            </div>
+        </div>
+
+        <div class="progress-container" id="progressContainer">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="progress-text" id="progressText">Обработка видео...</div>
+        </div>
+
+        <div class="result-section" id="resultSection">
+            <video id="resultVideo" class="result-video" controls></video>
+            <div style="text-align: center; margin: 20px 0;">
+                <button class="btn" onclick="downloadResult()" id="downloadBtn">📥 Скачать результат</button>
+            </div>
+            <div class="stats">
+                <div class="stat-item">
+                    <div class="stat-number" id="totalDetections">0</div>
+                    <div class="stat-label">Найдено логотипов</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedFile = null;
+        let currentResultFile = null;
+
+        const fileInput = document.getElementById('fileInput');
+        const uploadArea = document.querySelector('.upload-area');
+        const processBtn = document.getElementById('processBtn');
+        const progressContainer = document.getElementById('progressContainer');
+        const resultSection = document.getElementById('resultSection');
+        const progressFill = document.getElementById('progressFill');
+        const progressText = document.getElementById('progressText');
+
+        fileInput.addEventListener('change', handleFileSelect);
+        uploadArea.addEventListener('dragover', handleDragOver);
+        uploadArea.addEventListener('dragleave', handleDragLeave);
+        uploadArea.addEventListener('drop', handleDrop);
+
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                selectedFile = file;
+                processBtn.disabled = false;
+                uploadArea.textContent = `Выбрано: ${file.name}`;
+            }
+        }
+
+        function handleDragOver(event) {
+            event.preventDefault();
+            uploadArea.classList.add('dragover');
+        }
+
+        function handleDragLeave(event) {
+            event.preventDefault();
+            uploadArea.classList.remove('dragover');
+        }
+
+        function handleDrop(event) {
+            event.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const file = event.dataTransfer.files[0];
+            if (file && file.type.startsWith('video/')) {
+                selectedFile = file;
+                processBtn.disabled = false;
+                uploadArea.textContent = `Выбрано: ${file.name}`;
+            }
+        }
+
+        function simulateProgress() {
+            let progress = 0;
+            const interval = setInterval(() => {
+                // Более реалистичный прогресс
+                progress += Math.random() * 3 + 1;
+                if (progress > 98) progress = 98;
+                progressFill.style.width = progress + '%';
+                progressText.textContent = `Обработка видео... ${Math.round(progress)}%`;
+
+                if (progress >= 98) {
+                    clearInterval(interval);
+                }
+            }, 500);
+            return interval;
+        }
+
+        async function processVideo() {
+            if (!selectedFile) return;
+
+            progressContainer.style.display = 'block';
+            resultSection.style.display = 'none';
+            processBtn.disabled = true;
+
+            const progressInterval = simulateProgress();
+
+            const formData = new FormData();
+            formData.append('file', selectedFile);
+
+            try {
+                const response = await fetch('/detect-video', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                clearInterval(progressInterval);
+                progressFill.style.width = '100%';
+                progressText.textContent = 'Завершено!';
+
+                if (!response.ok) {
+                    throw new Error('Ошибка обработки видео');
+                }
+
+                const result = await response.json();
+
+                currentResultFile = result.video_data;
+                document.getElementById('resultVideo').src = `/static/${result.video_data}`;
+                document.getElementById('totalDetections').textContent = result.total_detections;
+
+                setTimeout(() => {
+                    progressContainer.style.display = 'none';
+                    resultSection.style.display = 'block';
+                    processBtn.disabled = false;
+                }, 1000);
+
+            } catch (error) {
+                clearInterval(progressInterval);
+                progressText.textContent = `Ошибка: ${error.message}`;
+                processBtn.disabled = false;
+            }
+        }
+
+        function downloadResult() {
+            if (currentResultFile) {
+                const link = document.createElement('a');
+                link.href = `/static/${currentResultFile}`;
+                link.download = currentResultFile;
+                link.click();
+            }
+        }
+    </script>
+</body>
+</html>

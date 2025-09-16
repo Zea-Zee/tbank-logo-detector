@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>T-Bank Logo Detector</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #fafafa;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 20px;
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .header h1 {
+            color: #000;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            color: #333;
+            font-size: 1.1em;
+        }
+
+        .upload-section {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .upload-area {
+            border: 3px dashed #ffd700;
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #fffef7;
+        }
+
+        .upload-area:hover {
+            border-color: #ffed4e;
+            background: #fffef0;
+        }
+
+        .upload-area.dragover {
+            border-color: #ffed4e;
+            background: #fffef0;
+        }
+
+        .upload-icon {
+            font-size: 3em;
+            color: #ffd700;
+            margin-bottom: 20px;
+        }
+
+        .upload-text {
+            font-size: 1.2em;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .upload-subtext {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        .btn {
+            background: #ffd700;
+            color: #000;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin: 10px;
+        }
+
+        .btn:hover {
+            background: #ffed4e;
+            transform: translateY(-2px);
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .result-section {
+            display: none;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .result-image {
+            max-width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .detections-list {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #ffd700;
+        }
+
+        .detection-item {
+            background: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .detection-info {
+            flex: 1;
+        }
+
+        .detection-number {
+            background: #ffd700;
+            color: #000;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 15px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #ffd700;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .nav {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .nav a {
+            color: #ffd700;
+            text-decoration: none;
+            font-weight: 600;
+            margin: 0 20px;
+            padding: 10px 20px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .nav a:hover {
+            background: #fffef0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏦 T-Bank Logo Detector</h1>
+            <p>Обнаружение логотипа Т-Банка на изображениях</p>
+        </div>
+
+        <div class="nav">
+            <a href="/">📷 Изображения</a>
+            <a href="/video">🎥 Видео</a>
+        </div>
+
+        <div class="upload-section">
+            <div class="upload-area" onclick="document.getElementById('fileInput').click()">
+                <div class="upload-icon">📷</div>
+                <div class="upload-text">Нажмите или перетащите изображение</div>
+                <div class="upload-subtext">Поддерживаемые форматы: JPEG, PNG, BMP, WEBP</div>
+            </div>
+            <input type="file" id="fileInput" accept="image/*">
+            <div style="text-align: center; margin-top: 20px;">
+                <button class="btn" onclick="processImage()" id="processBtn" disabled>Обработать изображение</button>
+            </div>
+        </div>
+
+        <div class="result-section" id="resultSection">
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <div>Обработка изображения...</div>
+            </div>
+            <div id="resultContent" style="display: none;">
+                <img id="resultImage" class="result-image" alt="Результат детекции">
+                <div style="text-align: center; margin: 20px 0;">
+                    <button class="btn" onclick="downloadResult()" id="downloadBtn">📥 Скачать результат</button>
+                </div>
+                <div class="detections-list">
+                    <h3>Найденные логотипы:</h3>
+                    <div id="detectionsList"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedFile = null;
+        let currentResultFile = null;
+
+        const fileInput = document.getElementById('fileInput');
+        const uploadArea = document.querySelector('.upload-area');
+        const processBtn = document.getElementById('processBtn');
+        const resultSection = document.getElementById('resultSection');
+        const loading = document.getElementById('loading');
+        const resultContent = document.getElementById('resultContent');
+
+        fileInput.addEventListener('change', handleFileSelect);
+        uploadArea.addEventListener('dragover', handleDragOver);
+        uploadArea.addEventListener('dragleave', handleDragLeave);
+        uploadArea.addEventListener('drop', handleDrop);
+
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                selectedFile = file;
+                processBtn.disabled = false;
+                uploadArea.textContent = `Выбрано: ${file.name}`;
+            }
+        }
+
+        function handleDragOver(event) {
+            event.preventDefault();
+            uploadArea.classList.add('dragover');
+        }
+
+        function handleDragLeave(event) {
+            event.preventDefault();
+            uploadArea.classList.remove('dragover');
+        }
+
+        function handleDrop(event) {
+            event.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const file = event.dataTransfer.files[0];
+            if (file && file.type.startsWith('image/')) {
+                selectedFile = file;
+                processBtn.disabled = false;
+                uploadArea.textContent = `Выбрано: ${file.name}`;
+            }
+        }
+
+        async function processImage() {
+            if (!selectedFile) return;
+
+            resultSection.style.display = 'block';
+            loading.style.display = 'block';
+            resultContent.style.display = 'none';
+
+            const formData = new FormData();
+            formData.append('file', selectedFile);
+
+            try {
+                const response = await fetch('/detect-image', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    throw new Error('Ошибка обработки изображения');
+                }
+
+                const result = await response.json();
+
+                currentResultFile = result.image_data;
+                document.getElementById('resultImage').src = `/static/${result.image_data}`;
+
+                const detectionsList = document.getElementById('detectionsList');
+                detectionsList.innerHTML = '';
+
+                if (result.detections.length === 0) {
+                    detectionsList.innerHTML = '<div style="text-align: center; color: #666; padding: 20px;">Логотипы не найдены</div>';
+                } else {
+                    result.detections.forEach((detection, index) => {
+                        const item = document.createElement('div');
+                        item.className = 'detection-item';
+                        item.innerHTML = `
+                            <div class="detection-number">${index + 1}</div>
+                            <div class="detection-info">
+                                <div><strong>Класс:</strong> T-Bank Logo</div>
+                                <div><strong>Координаты:</strong> (${detection.bbox.x_min}, ${detection.bbox.y_min}) - (${detection.bbox.x_max}, ${detection.bbox.y_max})</div>
+                            </div>
+                        `;
+                        detectionsList.appendChild(item);
+                    });
+                }
+
+                loading.style.display = 'none';
+                resultContent.style.display = 'block';
+
+            } catch (error) {
+                loading.innerHTML = `<div style="color: red;">Ошибка: ${error.message}</div>`;
+            }
+        }
+
+        function downloadResult() {
+            if (currentResultFile) {
+                const link = document.createElement('a');
+                link.href = `/static/${currentResultFile}`;
+                link.download = currentResultFile;
+                link.click();
+            }
+        }
+    </script>
+</body>
+</html>
