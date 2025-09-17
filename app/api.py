@@ -32,6 +32,12 @@ async def serve_static_file(file_path: str):
     return FileResponse(f"static/{file_path}")
 
 
+@app.get("/temp/{file_path:path}")
+async def serve_temp_file(file_path: str):
+    """Отдача временных файлов"""
+    return FileResponse(f"temp/{file_path}")
+
+
 @app.post("/detect", response_model=DetectionResponse)
 async def detect_logo(file: UploadFile = File(...)):
     """
@@ -44,11 +50,6 @@ async def detect_logo(file: UploadFile = File(...)):
         DetectionResponse: Результаты детекции с координатами найденных логотипов
     """
     logger.info(f"Запрос детекции: {file.filename}, тип: {file.content_type}")
-
-    if file.content_type not in ["image/jpeg", "image/png", "image/bmp", "image/webp"]:
-        logger.warning(f"Неподдерживаемый формат: {file.content_type}")
-        raise HTTPException(status_code=400, detail="Неподдерживаемый формат файла")
-
     try:
         image_bytes = await file.read()
         logger.info(f"Файл прочитан, размер: {len(image_bytes)} байт")
@@ -66,10 +67,6 @@ async def detect_logo(file: UploadFile = File(...)):
 async def detect_image_with_visualization(file: UploadFile = File(...)):
     """Детекция с визуализацией для фронтенда"""
     logger.info(f"Запрос детекции с визуализацией: {file.filename}, тип: {file.content_type}")
-
-    if file.content_type not in ["image/jpeg", "image/png", "image/bmp", "image/webp"]:
-        logger.warning(f"Неподдерживаемый формат: {file.content_type}")
-        raise HTTPException(status_code=400, detail="Неподдерживаемый формат файла")
 
     try:
         image_bytes = await file.read()
@@ -89,10 +86,6 @@ async def detect_image_with_visualization(file: UploadFile = File(...)):
 async def detect_video_with_visualization(file: UploadFile = File(...)):
     """Детекция на видео с визуализацией"""
     logger.info(f"Запрос детекции видео: {file.filename}, тип: {file.content_type}")
-
-    if file.content_type not in ["video/mp4", "video/avi"]:
-        logger.warning(f"Неподдерживаемый формат видео: {file.content_type}")
-        raise HTTPException(status_code=400, detail="Неподдерживаемый формат файла")
 
     try:
         video_bytes = await file.read()

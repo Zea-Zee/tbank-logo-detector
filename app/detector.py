@@ -26,18 +26,16 @@ class LogoDetector:
         logger.info(f"Начало детекции изображения, размер: {len(image_bytes)} байт")
 
         try:
-            # Сохраняем файл
             with tempfile.NamedTemporaryFile(suffix='.jpg', delete=False) as temp_file:
                 temp_file.write(image_bytes)
                 temp_path = temp_file.name
 
             logger.info(f"Временный файл создан: {temp_path}")
 
-            # Передаем путь в YOLO
             results = self._model.predict(
                 temp_path,
-                conf=0.25,
-                iou=0.01,
+                conf=0.5,
+                iou=0.1,
                 save=True,
                 project="temp",
                 name="detection"
@@ -83,11 +81,12 @@ class LogoDetector:
             result_path = os.path.join(result_dir, image_file)
             logger.info(f"Найден результат изображения: {result_path}")
 
-            # Копируем файл в static папку
-            static_filename = f"result_{os.path.basename(image_file)}"
-            static_path = os.path.join("static", static_filename)
-            shutil.copy2(result_path, static_path)
-            logger.info(f"Файл скопирован в static: {static_path}")
+            # Копируем файл в temp папку
+            result_filename = f"result_{os.path.basename(image_file)}"
+            result_temp_path = os.path.join("temp", result_filename)
+            os.makedirs("temp", exist_ok=True)
+            shutil.copy2(result_path, result_temp_path)
+            logger.info(f"Файл скопирован в temp: {result_temp_path}")
 
             # Удаляем временные файлы
             os.unlink(temp_path)
@@ -95,7 +94,7 @@ class LogoDetector:
             os.rmdir(result_dir)
 
             logger.info(f"Детекция завершена, найдено: {len(detections)} объектов")
-            return detections, static_filename
+            return detections, result_filename
 
         except Exception as e:
             logger.error(f"Ошибка детекции изображения: {e}", exc_info=True)
@@ -119,11 +118,10 @@ class LogoDetector:
 
             logger.info(f"Временный файл создан: {temp_path}")
 
-            # Передаем путь в YOLO БЕЗ stream=True для сохранения видео
             results = self._model.predict(
                 temp_path,
-                conf=0.25,
-                iou=0.01,
+                conf=0.5,
+                iou=0.1,
                 save=True,
                 project="temp",
                 name="detection"
@@ -159,11 +157,12 @@ class LogoDetector:
             result_path = os.path.join(result_dir, video_file)
             logger.info(f"Найден результат видео: {result_path}")
 
-            # Копируем файл в static папку
-            static_filename = f"result_{os.path.basename(video_file)}"
-            static_path = os.path.join("static", static_filename)
-            shutil.copy2(result_path, static_path)
-            logger.info(f"Файл скопирован в static: {static_path}")
+            # Копируем файл в temp папку
+            result_filename = f"result_{os.path.basename(video_file)}"
+            result_temp_path = os.path.join("temp", result_filename)
+            os.makedirs("temp", exist_ok=True)
+            shutil.copy2(result_path, result_temp_path)
+            logger.info(f"Файл скопирован в temp: {result_temp_path}")
 
             # Удаляем временные файлы
             os.unlink(temp_path)
@@ -171,7 +170,7 @@ class LogoDetector:
             os.rmdir(result_dir)
 
             logger.info(f"Детекция видео завершена, найдено: {total_detections} объектов")
-            return total_detections, static_filename
+            return total_detections, result_filename
 
         except Exception as e:
             logger.error(f"Ошибка детекции видео: {e}", exc_info=True)

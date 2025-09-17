@@ -12,7 +12,5 @@ tinkoff
 Новая папка
 runs
 ./temp/
-*.mp4*
-*.avi*
-*.jpg*
 *pycache*
+*.log*

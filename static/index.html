@@ -319,7 +319,7 @@
                 const result = await response.json();
 
                 currentResultFile = result.image_data;
-                document.getElementById('resultImage').src = `/static/${result.image_data}`;
+                document.getElementById('resultImage').src = `/temp/${result.image_data}`;
 
                 const detectionsList = document.getElementById('detectionsList');
                 detectionsList.innerHTML = '';
@@ -352,7 +352,7 @@
         function downloadResult() {
             if (currentResultFile) {
                 const link = document.createElement('a');
-                link.href = `/static/${currentResultFile}`;
+                link.href = `/temp/${currentResultFile}`;
                 link.download = currentResultFile;
                 link.click();
             }
