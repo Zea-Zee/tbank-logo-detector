@@ -67,7 +67,7 @@ class LogoDetector:
             result_dir = results[0].save_dir
             result_files = os.listdir(result_dir)
 
-            # Ищем изображение (обычно .jpg)
+            # Ищем изображение
             image_file = None
             for file in result_files:
                 if file.endswith(('.jpg', '.jpeg', '.png')):

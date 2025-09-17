@@ -2,7 +2,6 @@ import uvicorn
 import logging
 from app.api import app
 
-# Настройка логирования
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',

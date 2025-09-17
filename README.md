@@ -59,6 +59,8 @@ docker run -d \
 2. Загрузите изображение через веб-интерфейс
 3. Получите результат с визуализацией
 
+![alt text](<media/image copy.png>)
+
 ### Через API напрямую
 ```bash
 curl -X POST "http://localhost:8000/detect" \
