@@ -32,6 +32,10 @@ docker run -d \
   --restart unless-stopped \
   qzeaq/tbank-detector:latest
 ```
+Для windows
+```
+docker run -d --name tbank-detector -p 8000:8000 --restart unless-stopped qzeaq/tbank-detector:latest
+```
 
 ### Проверка работы
 Откройте браузер: http://localhost:8000
@@ -52,6 +56,11 @@ docker run -d \
   --restart unless-stopped \
   -v "$(pwd)/models:/app/models" \
   tbank-detector
+```
+
+Для windows
+```
+docker run -d --name tbank-detector -p 8000:8000 --restart unless-stopped -v "$(pwd)/models:/app/models" tbank-detector
 ```
 
 ### Проверка работы
