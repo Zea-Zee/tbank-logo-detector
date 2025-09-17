@@ -21,14 +21,14 @@ python main.py
 
 ### Скачивание и запуск
 ```bash
-docker pull your-username/tbank-detector:latest
+docker pull qzeaq/tbank-detector:latest
 
 docker run -d \
   --name tbank-detector \
   -p 8000:8000 \
   --restart unless-stopped \
   -v "$(pwd)/models:/app/models" \
-  your-username/tbank-detector:latest
+  qzeaq/tbank-detector:latest
 ```
 
 ### Проверка работы
