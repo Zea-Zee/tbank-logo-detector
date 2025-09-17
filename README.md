@@ -2,8 +2,11 @@
 
 ## Способ 1: Conda окружение
 
-### Создание и активация окружения
+### Создание и активация окружения (нужна conda или )
 ```bash
+git clone https://github.com/Zea-Zee/tbank-logo-detector.git
+cd tbank-logo-detector
+
 conda create -n tbank-detector python=3.10
 conda activate tbank-detector
 pip install -r requirements.txt
@@ -27,7 +30,6 @@ docker run -d \
   --name tbank-detector \
   -p 8000:8000 \
   --restart unless-stopped \
-  -v "$(pwd)/models:/app/models" \
   qzeaq/tbank-detector:latest
 ```
 
@@ -39,6 +41,9 @@ docker run -d \
 ### Подготовка
 ### Сборка и запуск
 ```bash
+git clone https://github.com/Zea-Zee/tbank-logo-detector.git
+cd tbank-logo-detector
+
 docker build -t tbank-detector .
 
 docker run -d \
@@ -137,7 +142,8 @@ FastAPI сервер с тремя основными эндпоинтами:
 Далее через PCA сжал размерность до 50 осей
 И с помощью HDBSCAN разделил на кластеры.
 Получились идеально семантически разделенные кластера (~50шт), и несколько кластеров было с логотипом Т банка, пример кластеров:
-![alt text](cluster_samples.png)
+[Примеры кластеров](media/cluster_samples.png)
+
 Оттуда я руками отобрал "хорошие" (более-менее сложные, не просто скриншот, где лого ортогонально камере) и относительно уникальные (не набирал 20 одинаковых картинок Т Банк бизнес), а с каждого кластера без Т Банка взял по 3 изображения в валидацию и 7 изображений для негативных примеров (помним, что в датасете было уже более 600 негативных примеров).
 
 Также у модели были проблемы с ложными предсказаниями, например на логотип Касперского с щитом, для этого я руками надобавлял негативных примеров с щитами (логотипы kaspersky, adguard, porcshe, ferrari, lamborgini и тд), также у модели были проблемы с тем, что она детектила букву T (так что я также добавил негативных прмиеров с буквой Т, например, логотип MS Teams).

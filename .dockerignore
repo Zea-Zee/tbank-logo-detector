@@ -28,3 +28,4 @@ coverage.xml
 
 # Model files (will be copied separately)
 *.pt
+
